@@ -130,10 +130,6 @@ jobs:
 
       - name: Show selected inputs debug
         run: |
-          github.event.inputs.CPUD=kalama
-          github.event.inputs.BUILD_METHOD=gki
-          echo "Selected CPUD: ${{ github.event.inputs.CPUD }}"
-          echo "Selected BUILD_METHOD: ${{ github.event.inputs.BUILD_METHOD }}"
           echo "Selected CPU: ${{ github.event.inputs.CPU }}"
           echo "Selected FEIL: ${{ github.event.inputs.FEIL }}"
           echo "Selected ANDROID_VERSION: ${{ github.event.inputs.ANDROID_VERSION }}"
@@ -345,8 +341,8 @@ jobs:
 
               if [  -e ./msm-kernel/modules.bzl ]; then
                 sed -i 's/"drivers\/block\/zram\/zram\.ko",//g; s/"mm\/zsmalloc\.ko",//g' "./msm-kernel/modules.bzl"
-                echo "CONFIG_ZSMALLOC=y" >> "msm-kernel/arch/arm64/configs/${{ github.event.inputs.CPUD }}-GKI.config"
-                echo "CONFIG_ZRAM=y" >> "msm-kernel/arch/arm64/configs/${{ github.event.inputs.CPUD }}-GKI.config"
+                echo "CONFIG_ZSMALLOC=y" >> "msm-kernel/arch/arm64/configs/kalama-GKI.config"
+                echo "CONFIG_ZRAM=y" >> "msm-kernel/arch/arm64/configs/kalama-GKI.config"
               fi
               
               echo "CONFIG_MODULE_SIG_FORCE=n" >> "$CONFIG_FILE"
@@ -375,11 +371,11 @@ jobs:
           git clone https://github.com/Numbersf/AnyKernel3 --depth=1
           rm -rf ./AnyKernel3/.git
 
-          dir1="kernel_workspace/kernel_platform/out/msm-kernel-${{ github.event.inputs.CPUD }}-${{ github.event.inputs.BUILD_METHOD }}/dist/"
-          dir2="kernel_workspace/kernel_platform/bazel-out/k8-fastbuild/bin/msm-kernel/${{ github.event.inputs.CPUD }}_gki_kbuild_mixed_tree/"
-          dir3="kernel_workspace/kernel_platform/out/msm-${{ github.event.inputs.CPUD }}-${{ github.event.inputs.CPUD }}-${{ github.event.inputs.BUILD_METHOD }}/dist/"
-          dir4="kernel_workspace/kernel_platform/out/msm-kernel-${{ github.event.inputs.CPUD }}-${{ github.event.inputs.BUILD_METHOD }}/gki_kernel/common/arch/arm64/boot/"
-          dir5="kernel_workspace/kernel_platform/out/msm-${{ github.event.inputs.CPUD }}-${{ github.event.inputs.CPUD }}-${{ github.event.inputs.BUILD_METHOD }}/gki_kernel/common/arch/arm64/boot/"
+          dir1="kernel_workspace/kernel_platform/out/msm-kernel-kalama-gki/dist/"
+          dir2="kernel_workspace/kernel_platform/bazel-out/k8-fastbuild/bin/msm-kernel/kalama_gki_kbuild_mixed_tree/"
+          dir3="kernel_workspace/kernel_platform/out/msm-kalama-kalama-gki/dist/"
+          dir4="kernel_workspace/kernel_platform/out/msm-kernel-kalama-gki/gki_kernel/common/arch/arm64/boot/"
+          dir5="kernel_workspace/kernel_platform/out/msm-kalama-kalama-gki/gki_kernel/common/arch/arm64/boot/"
           target1="./AnyKernel3/"
           target2="./kernel_workspace/kernel"
 
@@ -431,7 +427,7 @@ jobs:
       - name: Apply patch_linux and replace Image
         if: ${{ github.event.inputs.KPM == 'true' }}
         run: |
-          cd /home/runner/work/Action_OnePlus_MKSU_SUSFS/Action_OnePlus_MKSU_SUSFS/kernel_workspace/kernel_platform/out/msm-kernel-${{ github.event.inputs.CPUD }}-${{ github.event.inputs.BUILD_METHOD }}/dist
+          cd /home/runner/work/Action_OnePlus_MKSU_SUSFS/Action_OnePlus_MKSU_SUSFS/kernel_workspace/kernel_platform/out/msm-kernel-kalama-gki/dist
 
           curl -LSs "https://raw.githubusercontent.com/ShirkNeko/SukiSU_patch/refs/heads/main/kpm/patch_linux" -o patch_linux
           chmod +x patch_linux
