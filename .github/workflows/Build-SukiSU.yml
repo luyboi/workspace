@@ -19,7 +19,7 @@ on:
         type: choice
         description: "配置文件"
         required: true
-        default: oneplus_ace2_pro_v
+        default: oneplus_12r_v
         options:
           - oneplus_nord_ce4_v
           - oneplus_ace_3v_v
@@ -60,7 +60,7 @@ on:
         type: choice
         description: "内核安卓版本"
         required: true
-        default: android15
+        default: android13
         options:
           - android12
           - android13
@@ -93,17 +93,25 @@ on:
         type: boolean
         description: "是否启用手动钩子？"
         required: true
-        default: true
+        default: false
       KPM:
         type: boolean
         description: "是否启用KPM？"
         required: true
-        default: true
+        default: false
       ZRAM:
         type: boolean
         description: "是否启用添加更多的ZRAM算法？"
         required: true
         default: false
+      KERNEL_NAME:
+        description: "自定义 Linux version"
+        required: true
+        default: "-android13-8-o-86434-g661bc94gsda7"
+      UTS_VERSION:
+        description: "自定义 UTS_VERSION 时间戳"
+        required: true
+        default: "#1 SMP PREEMPT Tue Sep 9 09:15:45 UTC 2025"
 
 jobs:
   build:
@@ -130,6 +138,14 @@ jobs:
         run: |
           sudo apt update && sudo apt upgrade -y
           sudo apt install -y python3 git curl
+          if [ "${{ github.event.inputs.VFS }}" = "true" ]; then
+          sudo apt install -y ocaml ocaml-findlib opam
+          sudo apt install -y libpcre3-dev pkg-config
+          opam init -y --disable-sandboxing
+          eval $(opam env)
+          opam update
+          opam install -y --assume-depexts coccinelle.1.3.0
+          fi
 
       - name: Show selected inputs debug
         run: |
@@ -175,6 +191,23 @@ jobs:
           git add -A
           git commit -m "Force remove -dirty suffix from kernel version"
 
+      - name: Spoof Linux version
+        run: |
+          cd kernel_workspace/kernel_platform
+          sed -i '$s|echo "\$res"|echo "\${{ github.event.inputs.KERNEL_NAME }}"|' ./common/scripts/setlocalversion
+          sed -i '/UTS_VERSION=.*cut -b -\$UTS_LEN)/s#UTS_VERSION=.*#UTS_VERSION="\${{ github.event.inputs.UTS_VERSION }}"#' ./common/scripts/mkcompile_h
+
+      - name: Patch kernel by Coccinelle
+        run: |
+          cd kernel_workspace
+          if [ "${{ github.event.inputs.VFS }}" = "true" ]; then
+          git clone https://github.com/DdogezD/kernelsu-coccinelle
+          cd kernelsu-coccinelle/scope-minimized-hooks
+          eval $(opam env)
+          ./apply.sh ../../kernel_platform/common
+          rm -rf kernel_workspace/kernelsu-coccinelle
+          fi
+
       # 添加 SukiSU Ultra
       - name: Add KernelSU-SukiSU Ultra
         run: |
@@ -209,12 +242,6 @@ jobs:
           patch -p1 < 50_add_susfs_in_gki-${{ github.event.inputs.ANDROID_VERSION }}-${{ github.event.inputs.KERNEL_VERSION }}.patch || true
           echo "完成"
 
-      - name: Apply Hide Stuff Patches
-        run: |
-          cd kernel_workspace/kernel_platform/common
-          cp ../../SukiSU_patch/69_hide_stuff.patch ./
-          echo "正在打隐藏应用补丁"
-          patch -p1 -F 3 < 69_hide_stuff.patch
 
       - name: Apply VFS
         run: |
@@ -236,6 +263,24 @@ jobs:
             echo '完成LZ4KD补丁'
           fi
 
+      - name: Add defconfigs
+        run: |
+          cd kernel_workspace/kernel_platform
+          echo 'CONFIG_LLVM_POLLY=y' >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_KSU_KPROBES_HOOK=n" >> ./common/arch/arm64/configs/gki_defconfig
+          echo 'CONFIG_TMPFS_XATTR=y' >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_TMPFS_POSIX_ACL=y" >> ./common/arch/arm64/configs/gki_defconfig
+          echo 'CONFIG_TCP_CONG_ADVANCED=y' >> ./common/arch/arm64/configs/gki_defconfig
+          echo 'CONFIG_TCP_CONG_HTCP=n' >> ./common/arch/arm64/configs/gki_defconfig
+          echo 'CONFIG_TCP_CONG_BIC=n' >> ./common/arch/arm64/configs/gki_defconfig
+          echo 'CONFIG_TCP_CONG_BBR=n' >> ./common/arch/arm64/configs/gki_defconfig
+          echo 'CONFIG_TCP_CONG_WESTWOOD=y' >> ./common/arch/arm64/configs/gki_defconfig
+          echo 'CONFIG_DEFAULT_WESTWOOD=y' >> ./common/arch/arm64/configs/gki_defconfig
+          sed -i '/^CC_OPTIMIZE_FOR_PERFORMANCE=/d' ./common/arch/arm64/configs/gki_defconfig
+          echo 'CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE_O3=y' >> ./common/arch/arm64/configs/gki_defconfig
+          sed -i '/^[[:space:]]*depends on[[:space:]]\+ARC$/d' ./common/init/Kconfig
+          sed -i 's/check_defconfig//' ./common/build.config.gki
+
       # 配置信息
       - name: Add Configuration Settings
         run: |
@@ -245,9 +290,10 @@ jobs:
 
           # SukiSU Ultra config
           echo "CONFIG_KSU=y" >> "$CONFIG_FILE"
-          echo "CONFIG_KPM=y" >> "$CONFIG_FILE"
+          # echo "CONFIG_KPM=y" >> "$CONFIG_FILE"
           if [ "${{ github.event.inputs.VFS }}" = "false" ]; then
           echo "CONFIG_KPROBES=y" >> "$CONFIG_FILE"
+          echo "CONFIG_KSU_SUSFS_SUS_SU=y" >> "$CONFIG_FILE"
           fi
           # VFS config
           if [ "${{ github.event.inputs.VFS }}" = "true" ]; then
@@ -260,7 +306,7 @@ jobs:
           fi
 
           # SUSFS config
-          if [ "${{ github.event.inputs.VFS }}" = "true" ]; then
+          if [ "${{ github.event.inputs.SUSFS_CI }}" = "true" ]; then
           echo "CONFIG_KSU_SUSFS=y" >> "$CONFIG_FILE"
           echo "CONFIG_KSU_SUSFS_HAS_MAGIC_MOUNT=y" >> "$CONFIG_FILE"
           echo "CONFIG_KSU_SUSFS_SUS_PATH=y" >> "$CONFIG_FILE"
