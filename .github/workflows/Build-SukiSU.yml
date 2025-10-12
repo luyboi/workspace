@@ -130,6 +130,10 @@ jobs:
 
       - name: Show selected inputs debug
         run: |
+          github.event.inputs.CPUD=kalama
+          github.event.inputs.BUILD_METHOD=gki
+          echo "Selected CPUD: ${{ github.event.inputs.CPUD }}"
+          echo "Selected BUILD_METHOD: ${{ github.event.inputs.BUILD_METHOD }}"
           echo "Selected CPU: ${{ github.event.inputs.CPU }}"
           echo "Selected FEIL: ${{ github.event.inputs.FEIL }}"
           echo "Selected ANDROID_VERSION: ${{ github.event.inputs.ANDROID_VERSION }}"
