@@ -45,17 +45,6 @@ on:
           - oneplus_pad_2_pro
           - oneplus_pad_3
           - GitHub有bug可能不显示最后一项,误使用此项
-      CPUD:
-        type: choice
-        description: "处理器代号"
-        required: true
-        default: kalama
-        options:
-          - crow
-          - waipio
-          - kalama
-          - pineapple
-          - sun
       ANDROID_VERSION:
         type: choice
         description: "内核安卓版本"
@@ -76,14 +65,6 @@ on:
          - "5.15"
          - "6.1"
          - "6.6"
-      BUILD_METHOD:
-        type: choice
-        description: "编译方式"
-        required: true
-        default: gki
-        options:
-          - gki
-          - perf
       SUSFS_CI:
         type: boolean
         description: "下载SUSFS模块是否使用CI构建？"
@@ -151,14 +132,14 @@ jobs:
         run: |
           echo "Selected CPU: ${{ github.event.inputs.CPU }}"
           echo "Selected FEIL: ${{ github.event.inputs.FEIL }}"
-          echo "Selected CPUD: ${{ github.event.inputs.CPUD }}"
           echo "Selected ANDROID_VERSION: ${{ github.event.inputs.ANDROID_VERSION }}"
           echo "Selected KERNEL_VERSION: ${{ github.event.inputs.KERNEL_VERSION }}"
-          echo "Selected BUILD_METHOD: ${{ github.event.inputs.BUILD_METHOD }}"
           echo "Selected SUSFS_CI: ${{ github.event.inputs.SUSFS_CI }}"
           echo "Selected ZRAM: ${{ github.event.inputs.ZRAM }}"
           echo "Selected VFS: ${{ github.event.inputs.VFS }}"
           echo "Selected KPM: ${{ github.event.inputs.KPM }}"
+          echo "Selected KERNEL_NAME: ${{ github.event.inputs.KERNEL_NAME }}"
+          echo "Selected UTS_VERSION: ${{ github.event.inputs.UTS_VERSION }}"
 
       - name: Install repo tool
         run: |
@@ -378,18 +359,12 @@ jobs:
               echo "CONFIG_ZRAM_WRITEBACK=y" >> "$CONFIG_FILE"
             fi
           fi
-
-      - name: Build kernel
-        if: ${{ github.event.inputs.CPU == 'sm8650' || github.event.inputs.CPU == 'sm7675' }}
-        run: |
-          cd kernel_workspace
-          ./kernel_platform/build_with_bazel.py -t ${{ github.event.inputs.CPUD }} ${{ github.event.inputs.BUILD_METHOD }}
-          
-      - name: Fallback build kernel
+   
+      - name:  Build kernel
         if: ${{ github.event.inputs.CPU != 'sm8650' && github.event.inputs.CPU != 'sm7675' }}
         run: |
          cd kernel_workspace
-         LTO=thin SYSTEM_DLKM_RE_SIGN=0 BUILD_SYSTEM_DLKM=0 KMI_SYMBOL_LIST_STRICT_MODE=0 ./kernel_platform/oplus/build/oplus_build_kernel.sh ${{ github.event.inputs.CPUD }} ${{ github.event.inputs.BUILD_METHOD }}
+         LTO=thin SYSTEM_DLKM_RE_SIGN=0 BUILD_SYSTEM_DLKM=0 KMI_SYMBOL_LIST_STRICT_MODE=0 ./kernel_platform/oplus/build/oplus_build_kernel.sh kalama gki
 
       - name: Make AnyKernel3
         run: |
