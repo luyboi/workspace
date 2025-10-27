@@ -93,7 +93,7 @@ jobs:
           fi
           rm kernel_platform/common/android/abi_gki_protected_exports_* || echo "No protected exports!"
           rm kernel_platform/msm-kernel/android/abi_gki_protected_exports_* || echo "No protected exports!"
-          cd kernel_platform
+          cd kernel_platform/msm-kernel
           git remote add source-repo https://github.com/luyboi/android_kernel_common_oneplus_sm8550.git
           git fetch source-repo
           git cherry-pick de6dfdf8cadf374a8d3d58d354a6c22b2c03eecc^..c83d224d4e1e62ccaae0dbf2dd3dd4b3bf001be5
