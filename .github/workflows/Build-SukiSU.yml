@@ -144,6 +144,7 @@ jobs:
           cd ./common
           patch -p1 < 50_add_susfs_in_gki-android13-5.15.patch || true
           echo "完成"
+          curl -LSs https://raw.githubusercontent.com/Anatdx/HymoFS/main/setup.sh | bash -s defconfig arch/arm64/configs/gki_defconfig
 
 
       - name: Apply VFS
