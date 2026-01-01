@@ -191,7 +191,9 @@ jobs:
 
           # SukiSU Ultra config
           echo "CONFIG_KSU=y" >> "$CONFIG_FILE"
-          # echo "CONFIG_KPM=y" >> "$CONFIG_FILE"
+          if [ "${{ github.event.inputs.KPM }}" = "true" ]; then
+          echo "CONFIG_KPM=y" >> "$CONFIG_FILE"
+          fi
           if [ "${{ github.event.inputs.VFS }}" = "false" ]; then
           echo "CONFIG_KPROBES=y" >> "$CONFIG_FILE"
           echo "CONFIG_KSU_SUSFS_SUS_SU=y" >> "$CONFIG_FILE"
