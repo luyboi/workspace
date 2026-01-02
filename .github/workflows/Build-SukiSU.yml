@@ -184,6 +184,7 @@ jobs:
           if [ "${{ github.event.inputs.VFS }}" = "true" ]; then
             echo "CONFIG_KSU_SUSFS_SUS_SU=n" >> "$CONFIG_FILE"
             echo "CONFIG_KSU_MANUAL_HOOK=y" >> "$CONFIG_FILE"
+            echo "CONFIG_KSU_KPROBES_HOOK=n" >> "$CONFIG_FILE"
           fi
 
           if [ "${{ github.event.inputs.VFS }}" = "false" ]; then
