@@ -324,3 +324,27 @@ jobs:
         with:
           name: AnyKernel3_SukiSUUltra_${{ env.KSUVER }}_${{ steps.feil_clean.outputs.value }}${{ steps.suffix.outputs.value }}
           path: ./AnyKernel3/*
+
+      - name: Send to Telegram
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          BOT_CHAT: ${{ secrets.BOT_CHAT }}
+          SUSFSCI: ${{ inputs.SUSFS_CI }}
+          VFS: ${{ inputs.VFS }}
+          KPM: ${{ inputs.KPM }}
+          ZRAM: ${{ inputs.ZRAM }}
+          KERNELNAME: ${{ inputs.KERNEL_NAME }}
+          UTSVERSION: ${{ inputs.UTS_VERSION }}
+          KSUVERSION: ${{ env.KSUVER }}
+        run: |
+          pip install requests
+          AK3_ZIP=$(find AnyKernel3 -name "AnyKernel3_SukiSUUltra*.zip" -o -name "Image*.gz*" | head -1)
+          if [ -z "$AK3_ZIP" ] || [ ! -f "$AK3_ZIP" ]; then
+            echo "No AnyKernel3 zip found!"
+            ls -la AnyKernel3/
+            exit 1
+          fi
+          echo "Sending $AK3_ZIP"
+          ls
+          curl -L https://raw.githubusercontent.com/luyboi/workspace/refs/heads/test3/.github/bot.py -o ./bot.py
+          python ./bot.py "$AK3_ZIP"
