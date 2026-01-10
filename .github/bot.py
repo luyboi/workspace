@@ -15,6 +15,7 @@ KSUVERSION = os.environ.get('KSUVERSION', 'unknown')
 
 def get_caption():
     caption = f"""
+```
 SukiSU Ultra Build:
 KSU: v{KSUVERSION}
 KERNEL: {KERNELNAME}
@@ -23,6 +24,8 @@ SUSFS CI: {SUSFSCI}
 VFS: {VFS}
 KPM: {KPM}
 ZRAM: {ZRAM}
+```
+[Workflow run]({run_url})
 """
     return caption.strip()
 
