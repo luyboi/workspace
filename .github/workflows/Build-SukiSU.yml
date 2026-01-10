@@ -339,11 +339,11 @@ jobs:
         run: |
           pip install requests
           cd AnyKernel3
-          zip *
+          zip -r "AnyKernel3_SukiSUUltra_${{ env.KSUVER }}_${{ steps.feil_clean.outputs.value }}${{ steps.suffix.outputs.value }}.zip" *
           AK3_ZIP=$(find ./ -name "AnyKernel3_SukiSUUltra*.zip" -o -name "Image*.gz*" | head -1)
           if [ -z "$AK3_ZIP" ] || [ ! -f "$AK3_ZIP" ]; then
             echo "No AnyKernel3 zip found!"
-            ls -la AnyKernel3/
+            ls -la ./
             exit 1
           fi
           echo "Sending $AK3_ZIP"
