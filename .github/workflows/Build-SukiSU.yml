@@ -25,11 +25,11 @@ on:
       KERNEL_NAME:
         description: "自定义 Linux version"
         required: true
-        default: "-android13-8-o-01155-ga71f0d7db4db"
+        default: "-android13-8-o-01174-gb24799831231"
       UTS_VERSION:
         description: "自定义 UTS_VERSION 时间戳"
         required: true
-        default: "#1 SMP PREEMPT Fri Sep 19 12:00:24 UTC 2025"
+        default: "#1 SMP PREEMPT Thu Dec 11 10:07:08 UTC 2025"
 
 jobs:
   build:
