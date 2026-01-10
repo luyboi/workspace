@@ -338,7 +338,9 @@ jobs:
           KSUVERSION: ${{ env.KSUVER }}
         run: |
           pip install requests
-          AK3_ZIP=$(find AnyKernel3 -name "AnyKernel3_SukiSUUltra*.zip" -o -name "Image*.gz*" | head -1)
+          cd AnyKernel3
+          zip *
+          AK3_ZIP=$(find ./ -name "AnyKernel3_SukiSUUltra*.zip" -o -name "Image*.gz*" | head -1)
           if [ -z "$AK3_ZIP" ] || [ ! -f "$AK3_ZIP" ]; then
             echo "No AnyKernel3 zip found!"
             ls -la AnyKernel3/
