@@ -12,6 +12,7 @@ ZRAM = os.environ.get('ZRAM', 'false')
 KERNELNAME = os.environ.get('KERNELNAME', 'unknown')
 UTSVERSION = os.environ.get('UTSVERSION', 'unknown')
 KSUVERSION = os.environ.get('KSUVERSION', 'unknown')
+RUN_URL = os.environ.get("RUN_URL")
 
 def get_caption():
     caption = f"""
@@ -25,7 +26,7 @@ VFS: {VFS}
 KPM: {KPM}
 ZRAM: {ZRAM}
 ```
-[Workflow run]({run_url})
+[Workflow run]({RUN_URL})
 """
     return caption.strip()
 
