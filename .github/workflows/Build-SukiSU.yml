@@ -336,6 +336,7 @@ jobs:
           KERNELNAME: ${{ inputs.KERNEL_NAME }}
           UTSVERSION: ${{ inputs.UTS_VERSION }}
           KSUVERSION: ${{ env.KSUVER }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           pip install requests
           cd AnyKernel3
