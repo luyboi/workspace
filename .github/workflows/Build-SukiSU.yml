@@ -107,7 +107,7 @@ jobs:
       - name: Apply Patches SukiSU Ultra
         run: |
           cd kernel_workspace
-          git clone https://gitlab.com/simonpunk/susfs4ksu.git -b gki-android13-5.15
+          git clone https://github.com/luyboi/susfs4ksu.git
           git clone https://github.com/ShirkNeko/SukiSU_patch.git
           cd kernel_platform
           echo "正在给内核打susfs补丁"
@@ -194,9 +194,7 @@ jobs:
           # SUSFS config
           if [ "${{ github.event.inputs.SUSFS_CI }}" = "true" ]; then
           echo "CONFIG_KSU_SUSFS=y" >> "$CONFIG_FILE"
-          awk 'NR==41{print "#ifdef CONFIG_KSU_SUSFS_SUS_MAP\n#include <linux/susfs_def.h>\n#endif"}1' ./common/mm/memory.c > tmp && mv tmp ./common/mm/memory.c
           echo "CONFIG_KSU_SUSFS_HAS_MAGIC_MOUNT=y" >> "$CONFIG_FILE"
-          echo "CONFIG_KSU_SUSFS_SUS_MAP=y" >> "$CONFIG_FILE"
           echo "CONFIG_KSU_SUSFS_SUS_PATH=y" >> "$CONFIG_FILE"
           echo "CONFIG_KSU_SUSFS_SUS_MOUNT=y" >> "$CONFIG_FILE"
           echo "CONFIG_KSU_SUSFS_AUTO_ADD_SUS_KSU_DEFAULT_MOUNT=y" >> "$CONFIG_FILE"
@@ -234,12 +232,6 @@ jobs:
               echo "CONFIG_ZRAM_WRITEBACK=y" >> "$CONFIG_FILE"
             fi
           fi
-
-      - name: Upload memory.c
-        uses: actions/upload-artifact@v4
-        with:
-          name: memory.c
-          path: ./kernel_workspace/kernel_platform/common/mm/memory.c
 
       - name:  Build kernel
         run: |
