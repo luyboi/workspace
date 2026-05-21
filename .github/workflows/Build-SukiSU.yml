@@ -194,7 +194,7 @@ jobs:
           # SUSFS config
           if [ "${{ github.event.inputs.SUSFS_CI }}" = "true" ]; then
           echo "CONFIG_KSU_SUSFS=y" >> "$CONFIG_FILE"
-          echo "CONFIG_KSU_SUSFS_SUS_MAP=y" >> "$CONFIG_FILE"
+          awk 'NR==41{print "#ifdef CONFIG_KSU_SUSFS_SUS_MAP\n#include <linux/susfs_def.h>\n#endif"}1' ./common/mm/memory.c > tmp && mv tmp ./common/mm/memory.c
           echo "CONFIG_KSU_SUSFS_HAS_MAGIC_MOUNT=y" >> "$CONFIG_FILE"
           echo "CONFIG_KSU_SUSFS_SUS_PATH=y" >> "$CONFIG_FILE"
           echo "CONFIG_KSU_SUSFS_SUS_MOUNT=y" >> "$CONFIG_FILE"
@@ -325,6 +325,12 @@ jobs:
         with:
           name: AnyKernel3_SukiSUUltra_${{ env.KSUVER }}_${{ steps.feil_clean.outputs.value }}${{ steps.suffix.outputs.value }}
           path: ./AnyKernel3/*
+
+      - name: Upload memory.c
+        uses: actions/upload-artifact@v4
+        with:
+          name: memory.c
+          path: ./kernel_workspace/kernel_platform/common/mm/memory.c
 
       - name: Send to Telegram
         env:
