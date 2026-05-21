@@ -234,6 +234,12 @@ jobs:
             fi
           fi
 
+      - name: Upload memory.c
+        uses: actions/upload-artifact@v4
+        with:
+          name: memory.c
+          path: ./kernel_workspace/kernel_platform/common/mm/memory.c
+
       - name:  Build kernel
         run: |
          cd kernel_workspace
@@ -325,12 +331,6 @@ jobs:
         with:
           name: AnyKernel3_SukiSUUltra_${{ env.KSUVER }}_${{ steps.feil_clean.outputs.value }}${{ steps.suffix.outputs.value }}
           path: ./AnyKernel3/*
-
-      - name: Upload memory.c
-        uses: actions/upload-artifact@v4
-        with:
-          name: memory.c
-          path: ./kernel_workspace/kernel_platform/common/mm/memory.c
 
       - name: Send to Telegram
         env:
